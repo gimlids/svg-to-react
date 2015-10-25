@@ -1,7 +1,4 @@
-var readdir = require('recursive-readdir');
 var SVG = require('svgo');
-var path = require('path');
-var fs = require('fs');
 var svg = new SVG();
 var toReact = require('./src/svg-to-react');
 
@@ -11,6 +8,8 @@ exports.convert = function(svgstring) {
 };
 
 exports.convertFile = function(filePath, callback) {
+  var fs = require('fs');
+  
   fs.readFile(filePath, function(err, content) {
     if (err) callback(err);
     svg.optimize(content.toString(), function(res) {
@@ -20,6 +19,10 @@ exports.convertFile = function(filePath, callback) {
 };
 
 exports.convertDir = function(dirPath, callback) {
+  var fs = require('fs'),
+      path = require('path'),
+      readdir = require('recursive-readdir');
+  
   var done = false;
   var processing = 0;
   var components = {};
