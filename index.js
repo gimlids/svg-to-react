@@ -2,58 +2,11 @@ var SVG = require('svgo');
 var svg = new SVG();
 var toReact = require('./src/svg-to-react');
 
+// svgo looks cool, but let's try without for now since it's async
+/*
+svg.optimize(content.toString(), function(res) {
+callback(null, toReact(res.data));
+});
+*/
 
-exports.convert = function(svgstring) {
-  return toReact(svgstring);
-};
-
-exports.convertFile = function(filePath, callback) {
-  var fs = require('fs');
-  
-  fs.readFile(filePath, function(err, content) {
-    if (err) callback(err);
-    svg.optimize(content.toString(), function(res) {
-      callback(null, toReact(res.data));
-    });
-  });
-};
-
-exports.convertDir = function(dirPath, callback) {
-  var fs = require('fs'),
-      path = require('path'),
-      readdir = require('recursive-readdir');
-  
-  var done = false;
-  var processing = 0;
-  var components = {};
-
-  function bail(err) {
-    done = true;
-    callback(err);
-  }
-
-  function converFile(filePath) {
-    if (done || path.extname(filePath) !== '.svg') return;
-    processing++;
-
-    fs.readFile(filePath, function(err, content) {
-      if (err) return bail(err);
-      svg.optimize(content.toString(), function(res) {
-        var key = path.relative(dirPath, filePath).replace(/\.svg$/, '');
-
-        components[key] = toReact(res.data);
-        processing--;
-
-        if (processing === 0) {
-          callback(null, components);
-        }
-      });
-    });
-  }
-
-  // the ignore pattern seems buggy
-  readdir(dirPath, function(err, filePaths) {
-    if (err) return bail(err);
-    filePaths.map(converFile);
-  });
-};
+exports = toReact;
